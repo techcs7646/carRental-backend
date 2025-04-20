@@ -18,7 +18,7 @@ const app = express();
 // Backend CORS configuration should include:
 const allowedOrigins = [
   'https://car-rental-frontend-psi-lovat.vercel.app',
-  'http://localhost:5000'
+  'http://localhost:5173'
 ];
 
 app.use(cors({
