@@ -16,11 +16,17 @@ connectDB();
 const app = express();
 
 // Backend CORS configuration should include:
+const allowedOrigins = [
+  'https://car-rental-frontend-psi-lovat.vercel.app',
+  'http://localhost:5000'
+];
+
 app.use(cors({
-    origin: 'https://car-rental-frontend-psi-lovat.vercel.app',
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    credentials: true
-  }));
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  credentials: true
+}));
+
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
