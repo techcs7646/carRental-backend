@@ -7,7 +7,6 @@ exports.registerUser = async (req, res) => {
     try {
         const { name, email, password, phone } = req.body;
 
-        // Check if user exists
         const userExists = await User.findOne({ email });
         if (userExists) {
             return res.status(400).json({
@@ -16,7 +15,6 @@ exports.registerUser = async (req, res) => {
             });
         }
 
-        // Create user
         const user = await User.create({
             name,
             email,
