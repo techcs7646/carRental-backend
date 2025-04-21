@@ -21,10 +21,6 @@ const userSchema = mongoose.Schema({
         type: String,
         required: [true, 'Please add a phone number']
     },
-    drivingLicense: {
-        type: String,
-        required: [true, 'Please add driving license number']
-    },
     status: {
         type: String,
         enum: ['Active', 'Banned'],
