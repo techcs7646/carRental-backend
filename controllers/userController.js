@@ -47,33 +47,65 @@ exports.loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await User.findOne({ email });
-        if (user && (await user.matchPassword(password))) {
-            res.json({
-                success: true,
-                token: createToken(user),
-                user: {
-                    _id: user._id,
-                    name: user.name,
-                    email: user.email,
-                    phone: user.phone
-                }
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide email and password'
             });
-        } else {
-            res.status(401).json({
+        }
+
+        // Find user by email without status check first
+        const user = await User.findOne({ email });
+        
+        // Debug log
+        console.log('Login attempt:', { email, userFound: !!user });
+
+        if (!user) {
+            return res.status(401).json({
                 success: false,
                 message: 'Invalid email or password'
             });
         }
+
+      
+        if (user.status === 'Banned') {
+            return res.status(403).json({
+                success: false,
+                message: 'Your account has been banned. Please contact support.'
+            });
+        }
+
+       
+        const isMatch = await user.matchPassword(password);
+        console.log('Password match:', isMatch);
+
+        if (!isMatch) {
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid email or password'
+            });
+        }
+
+        // Success response
+        res.json({
+            success: true,
+            token: createToken(user),
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone
+            }
+        });
     } catch (error) {
-        console.error('Error in loginUser:', error);
+        console.error('Login error details:', error);
         res.status(500).json({
             success: false,
-            message: error.message
+            message: 'Server error during login'
         });
     }
 };
-
 // Get user profile
 exports.getProfile = async (req, res) => {
     try {
