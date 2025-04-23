@@ -55,10 +55,10 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-        // Find user by email without status check first
+       
         const user = await User.findOne({ email });
         
-        // Debug log
+       
         console.log('Login attempt:', { email, userFound: !!user });
 
         if (!user) {
@@ -68,7 +68,7 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-      
+        // Check if user is banned
         if (user.status === 'Banned') {
             return res.status(403).json({
                 success: false,
@@ -76,7 +76,7 @@ exports.loginUser = async (req, res) => {
             });
         }
 
-       
+        // Verify password and debug log
         const isMatch = await user.matchPassword(password);
         console.log('Password match:', isMatch);
 
@@ -106,13 +106,29 @@ exports.loginUser = async (req, res) => {
         });
     }
 };
+
 // Get user profile
 exports.getProfile = async (req, res) => {
     try {
+        // Check if user exists in request
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
+
         // Get user details
         const user = await User.findById(req.user._id)
             .select('-password')
             .lean();
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
 
         // Get user's bookings
         const bookings = await Booking.find({ userId: req.user._id })
@@ -120,15 +136,14 @@ exports.getProfile = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean();
 
-        // Format the response
         const formattedBookings = bookings.map(booking => ({
             _id: booking._id,
-            car: {
+            car: booking.carId ? {
                 _id: booking.carId._id,
                 name: booking.carId.name,
                 brand: booking.carId.brand,
                 image: booking.carId.image
-            },
+            } : null,
             startDate: booking.startDate,
             endDate: booking.endDate,
             totalAmount: booking.totalAmount,

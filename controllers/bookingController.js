@@ -146,14 +146,22 @@ exports.updateBookingStatus = async (req, res) => {
 
 exports.getUserBookings = async (req, res) => {
     try {
-        const userId = req.user.id;
+        // Check if user is authenticated
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({
+                success: false,
+                message: 'User not authenticated'
+            });
+        }
+
+        const userId = req.user._id;
 
         const bookings = await Booking.find({ userId })
             .populate({
                 path: 'carId',
                 select: 'name brand model year price image fuelType transmission type seats features'
             })
-            .sort({ createdAt: -1 }); 
+            .sort({ createdAt: -1 });
 
         const formattedBookings = bookings.map(booking => ({
             _id: booking._id,
@@ -165,7 +173,7 @@ exports.getUserBookings = async (req, res) => {
             dropoffLocation: booking.dropoffLocation,
             totalAmount: booking.totalAmount,
             status: booking.status,
-            car: {
+            car: booking.carId ? { 
                 id: booking.carId._id,
                 name: booking.carId.name,
                 brand: booking.carId.brand,
@@ -178,7 +186,7 @@ exports.getUserBookings = async (req, res) => {
                 type: booking.carId.type,
                 seats: booking.carId.seats,
                 features: booking.carId.features
-            }
+            } : null 
         }));
 
         res.json({
@@ -186,13 +194,13 @@ exports.getUserBookings = async (req, res) => {
             data: formattedBookings
         });
     } catch (error) {
+        console.error('Error in getUserBookings:', error); // Log the error details
         res.status(500).json({
             success: false,
             message: error.message
         });
     }
 };
-
 // Get booking by ID
 exports.getBookingById = async (req, res) => {
     try {

@@ -107,7 +107,6 @@ exports.getBookingStats = async (req, res) => {
             { $sort: { name: 1 } }
         ]);
 
-        // Format status names and ensure all statuses are included
         const statusMap = {
             'pending': 'Pending',
             'confirmed': 'Confirmed',
@@ -242,7 +241,7 @@ exports.getCarPerformance = async (req, res) => {
                 }
             },
             {
-                $sort: { revenue: -1 } // Sort by revenue in descending order
+                $sort: { revenue: -1 } 
             }
         ]);
 

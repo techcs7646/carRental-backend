@@ -155,17 +155,17 @@ exports.getRecentBookings = async (req, res) => {
 
         const formattedBookings = recentBookings.map(booking => ({
             _id: booking._id,
-            userId: {
+            userId: booking.userId ? {
                 _id: booking.userId._id,
                 name: booking.userId.name,
                 email: booking.userId.email
-            },
-            carId: {
+            } : null,
+            carId: booking.carId ? {
                 _id: booking.carId._id,
                 name: booking.carId.name,
                 brand: booking.carId.brand,
                 model: booking.carId.model
-            },
+            } : null,
             startDate: booking.startDate,
             endDate: booking.endDate,
             amount: booking.totalAmount,
@@ -173,8 +173,15 @@ exports.getRecentBookings = async (req, res) => {
             createdAt: booking.createdAt
         }));
 
-        res.json(formattedBookings);
+        res.json({
+            success: true,
+            data: formattedBookings
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error('Error in getRecentBookings:', error);
+        res.status(500).json({ 
+            success: false,
+            message: error.message 
+        });
     }
 };

@@ -6,8 +6,6 @@ exports.getAllUsers = async (req, res) => {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
-
-        // Get total users count
         const totalUsers = await User.countDocuments();
 
         // Get users with pagination

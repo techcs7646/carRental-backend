@@ -11,11 +11,8 @@ const {
 } = require('../controllers/adminController');
 const {
     addCar,
-    getAllCars,
-    getCarById,
-    updateCar,
-    deleteCar,
-    getCarImage  // Add this import
+    getCarById
+    
 } = require('../controllers/carController');
 const {
     getDashboardStats,
@@ -41,10 +38,8 @@ router.put('/change-password', protect, changePassword);
 
 // Car routes
 router.post('/cars', protect, upload.single('image'), addCar);
-router.get('/cars', protect, getAllCars);
 router.get('/cars/:id', protect, getCarById);
-router.put('/cars/:id', protect, updateCar);
-router.delete('/cars/:id', protect, deleteCar);
+
 
 // Booking routes
 router.get('/bookings', protect, getAllBookings);

@@ -22,39 +22,14 @@ exports.createPaymentIntent = async (req, res) => {
         });
 
         res.json({
-            paymentIntentId: paymentIntent.id,  // This is what you need for confirmation
-            clientSecret: paymentIntent.client_secret  // This is for the frontend Stripe SDK
+            paymentIntentId: paymentIntent.id, 
+            clientSecret: paymentIntent.client_secret 
         });
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
-// Add this function to generate receipt
-const generateReceipt = async (booking, paymentIntent) => {
-    return {
-        receiptNumber: `RCP-${Date.now()}`,
-        date: new Date(),
-        customerName: booking.user.name,
-        customerEmail: booking.user.email,
-        carDetails: {
-            name: booking.car.name,
-            brand: booking.car.brand,
-            model: booking.car.model
-        },
-        bookingDetails: {
-            startDate: booking.startDate,
-            endDate: booking.endDate,
-            totalDays: Math.ceil((new Date(booking.endDate) - new Date(booking.startDate)) / (1000 * 60 * 60 * 24))
-        },
-        paymentDetails: {
-            amount: booking.totalPrice,
-            paymentId: paymentIntent.id,
-            paymentStatus: 'Paid',
-            paymentDate: new Date(paymentIntent.created * 1000)
-        }
-    };
-};
 
 // Update the confirmPayment function
 exports.confirmPayment = async (req, res) => {
