@@ -15,10 +15,6 @@ const adminSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    phone: {
-        type: String,
-        required: true
-    },
     lastLogin: {
         type: Date,
         default: Date.now
